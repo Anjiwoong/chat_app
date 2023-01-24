@@ -1,5 +1,5 @@
 import 'package:chat_app/config/palette.dart';
-import 'package:chat_app/screens/chat_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
@@ -14,7 +14,7 @@ class LoginSignupScreen extends StatefulWidget {
 class _LoginSignupScreenState extends State<LoginSignupScreen> {
   final _authentication = FirebaseAuth.instance;
 
-  bool isSignupScreen = true;
+  bool isSignupScreen = false;
   bool showSpinner = false;
   final _formKey = GlobalKey<FormState>();
   String userName = '';
@@ -476,16 +476,23 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                               password: userPassword,
                             );
 
+                            await FirebaseFirestore.instance
+                                .collection('user')
+                                .doc(newUser.user!.uid)
+                                .set(
+                              {'userName': userName, 'email': userEmail},
+                            );
+
                             if (newUser.user != null) {
                               // ignore: use_build_context_synchronously
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) {
-                                    return const ChatScreen();
-                                  },
-                                ),
-                              );
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) {
+                              //       return const ChatScreen();
+                              //     },
+                              //   ),
+                              // );
                               setState(() {
                                 showSpinner = false;
                               });
@@ -499,6 +506,9 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                                 backgroundColor: Colors.blue,
                               ),
                             );
+                            setState(() {
+                              showSpinner = false;
+                            });
                           }
                         }
                         if (!isSignupScreen) {
@@ -512,20 +522,23 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                             );
                             if (newUser.user != null) {
                               // ignore: use_build_context_synchronously
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) {
-                                    return const ChatScreen();
-                                  },
-                                ),
-                              );
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) {
+                              //       return const ChatScreen();
+                              //     },
+                              //   ),
+                              // );
                               setState(() {
                                 showSpinner = false;
                               });
                             }
                           } catch (e) {
                             print(e);
+                            setState(() {
+                              showSpinner = false;
+                            });
                           }
                         }
                       },
